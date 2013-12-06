@@ -63,7 +63,7 @@ class Ernie(object):
         output.write(data)
         output.flush()
 
-    def start(self, quiet_on_read_err=False):
+    def start(self, quiet_on_io_err=False):
         Ernie.log("Starting")
         # On windows nouse_stdio is ignored by Erlang at the port creation,
         # so we cannot use file descriptor 3 and 4 for communication.
@@ -75,7 +75,7 @@ class Ernie(object):
         while(True):
             ipy = self.read_berp(input)
             if ipy == None:
-                if not quiet_on_read_err:
+                if not quiet_on_io_err:
                     print ('Could not read BERP length header. '
                            'Ernie server may have gone away. '
                            'Exiting now.')
@@ -91,7 +91,7 @@ class Ernie(object):
                     try:
                         self.write_berp(output, opy)
                     except IOError as e:
-                        if quiet_on_read_err:
+                        if quiet_on_io_err:
                             exit()
                         else:
                             raise e
@@ -101,7 +101,7 @@ class Ernie(object):
                     try:
                         self.write_berp(output, opy)
                     except IOError as e:
-                        if quiet_on_read_err:
+                        if quiet_on_io_err:
                             exit()
                         else:
                             raise e
@@ -111,7 +111,7 @@ class Ernie(object):
                     try:
                         self.write_berp(output, opy)
                     except IOError as e:
-                        if quiet_on_read_err:
+                        if quiet_on_io_err:
                             exit()
                         else:
                             raise e
@@ -125,7 +125,7 @@ class Ernie(object):
                 try:
                     self.write_berp(output, (bert.Atom('noreply')))
                 except IOError as e:
-                    if quiet_on_read_err:
+                    if quiet_on_io_err:
                         exit()
                     else:
                         raise e
@@ -136,7 +136,7 @@ class Ernie(object):
                 try:
                     self.write_berp(output, opy)
                 except IOError as e:
-                    if quiet_on_read_err:
+                    if quiet_on_io_err:
                         exit()
                     else:
                         raise e
