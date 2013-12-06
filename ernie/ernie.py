@@ -92,7 +92,6 @@ class Ernie(object):
                         self.write_berp(output, opy)
                     except IOError as e:
                         if quiet_on_read_err:
-                            # quiet on read error
                             exit()
                         else:
                             raise e
@@ -103,7 +102,6 @@ class Ernie(object):
                         self.write_berp(output, opy)
                     except IOError as e:
                         if quiet_on_read_err:
-                            # quiet on read error
                             exit()
                         else:
                             raise e
@@ -114,7 +112,6 @@ class Ernie(object):
                         self.write_berp(output, opy)
                     except IOError as e:
                         if quiet_on_read_err:
-                            # quiet on read error
                             exit()
                         else:
                             raise e
@@ -129,7 +126,6 @@ class Ernie(object):
                     self.write_berp(output, (bert.Atom('noreply')))
                 except IOError as e:
                     if quiet_on_read_err:
-                        # quiet on read error
                         exit()
                     else:
                         raise e
@@ -141,7 +137,6 @@ class Ernie(object):
                     self.write_berp(output, opy)
                 except IOError as e:
                     if quiet_on_read_err:
-                        # quiet on read error
                         exit()
                     else:
                         raise e
