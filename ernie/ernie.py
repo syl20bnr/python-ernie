@@ -63,7 +63,7 @@ class Ernie(object):
         output.write(data)
         output.flush()
 
-    def start(self):
+    def start(self, quiet_on_read_err=False):
         Ernie.log("Starting")
         # On windows nouse_stdio is ignored by Erlang at the port creation,
         # so we cannot use file descriptor 3 and 4 for communication.
@@ -75,7 +75,10 @@ class Ernie(object):
         while(True):
             ipy = self.read_berp(input)
             if ipy == None:
-                print 'Could not read BERP length header. Ernie server may have gone away. Exiting now.'
+                if not quiet_on_read_err:
+                    print ('Could not read BERP length header. '
+                           'Ernie server may have gone away. '
+                           'Exiting now.')
                 exit()
 
             if len(ipy) == 4 and ipy[0] == bert.Atom('call'):
@@ -85,15 +88,36 @@ class Ernie(object):
                     res = self.dispatch(mod, fun, args)
                     opy = (bert.Atom('reply'), res)
                     self.log("<- " + opy.__str__())
-                    self.write_berp(output, opy)
+                    try:
+                        self.write_berp(output, opy)
+                    except IOError as e:
+                        if quiet_on_read_err:
+                            # quiet on read error
+                            exit()
+                        else:
+                            raise e
                 except ServerError, e:
                     opy = (bert.Atom('error'), (bert.Atom('server'), 0, str(type(e)), str(e), ''))
                     self.log("<- " + opy.__str__())
-                    self.write_berp(output, opy)
+                    try:
+                        self.write_berp(output, opy)
+                    except IOError as e:
+                        if quiet_on_read_err:
+                            # quiet on read error
+                            exit()
+                        else:
+                            raise e
                 except Exception, e:
                     opy = (bert.Atom('error'), (bert.Atom('user'), 0, str(type(e)), str(e), ''))
                     self.log("<- " + opy.__str__())
-                    self.write_berp(output, opy)
+                    try:
+                        self.write_berp(output, opy)
+                    except IOError as e:
+                        if quiet_on_read_err:
+                            # quiet on read error
+                            exit()
+                        else:
+                            raise e
             elif len(ipy) == 4 and ipy[0] == bert.Atom('cast'):
                 mod, fun, args = ipy[1:4]
                 self.log("-> " + ipy.__str__())
@@ -101,12 +125,26 @@ class Ernie(object):
                     res = self.dispatch(mod, fun, args)
                 except:
                     pass
-                self.write_berp(output, (bert.Atom('noreply')))
+                try:
+                    self.write_berp(output, (bert.Atom('noreply')))
+                except IOError as e:
+                    if quiet_on_read_err:
+                        # quiet on read error
+                        exit()
+                    else:
+                        raise e
             else:
                 self.log("-> " + ipy.__str__())
                 opy = (bert.Atom('error'), (bert.Atom('server'), 0, "Invalid request: " + ipy.__str__()))
                 self.log("<- " + opy.__str__())
-                self.write_berp(output, opy)
+                try:
+                    self.write_berp(output, opy)
+                except IOError as e:
+                    if quiet_on_read_err:
+                        # quiet on read error
+                        exit()
+                    else:
+                        raise e
 
 class ServerError(Exception):
     def __init__(self, value):
